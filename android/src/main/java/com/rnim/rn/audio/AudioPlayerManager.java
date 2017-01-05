@@ -7,6 +7,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
 
 import java.io.File;
@@ -69,7 +70,7 @@ class AudioPlayerManager extends ReactContextBaseJavaModule {
 
 
   @ReactMethod
-  public void getDurationFromPath(String path, Promise promise ) {
+  public void getDurationFromPath(String path, Promise promise) {
     if (path == null) {
       Log.e("PATH_NOT_SET", "Please add path");
       promise.reject("PATH_NOT_SET", "Please add path");
@@ -79,18 +80,20 @@ class AudioPlayerManager extends ReactContextBaseJavaModule {
     if (!mediaPlayerReady){
       return;
     }
-    promise.resolve(mediaPlayer.getDuration());
+    promise.resolve(mediaPlayer.getDuration() / 1e3);
   }
 
   @ReactMethod
-  public void getDuration(Promise promise) {
+  public void getDuration(Callback callback) {
     if (mediaPlayer == null) {
       Log.e("PLAYER_NOT_PREPARED", "Please call startPlaying before stopping playback");
-      promise.reject("PLAYER_NOT_PREPARED", "Please call startPlaying before stopping playback");
+      if (callback != null)
+	  callback.invoke(null, null);
       return;
     }
-    promise.resolve(mediaPlayer.getDuration());
 
+    if (callback != null)
+	callback.invoke(null, mediaPlayer.getDuration() / 1e3);
   }
 
   @ReactMethod
@@ -162,6 +165,19 @@ class AudioPlayerManager extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void getCurrentTime(Callback callback) {
+    if (mediaPlayer == null) {
+      Log.e("PLAYER_NOT_PREPARED", "Please call startPlaying before stopping playback");
+      if ( callback != null )
+	callback.invoke(null, null);
+      return;
+    }
+
+    if ( callback != null )
+      callback.invoke(null, mediaPlayer.getCurrentPosition() / 1e3);
+  }
+
+  @ReactMethod
   public void setCurrentTime(int position, final Promise promise) {
     Log.d("NOT_SUPPORTED","Not supported in android using skipToSeconds method");
     skipToSeconds(position, promise);
@@ -174,7 +190,7 @@ class AudioPlayerManager extends ReactContextBaseJavaModule {
       promise.reject("INVALID_STATE", "No playback");
       return;
     }
-    mediaPlayer.seekTo(position);
+    mediaPlayer.seekTo(currentPosition = (int) (position * 1e3));
   }
 
   @ReactMethod
