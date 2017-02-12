@@ -7,7 +7,6 @@
 //
 
 #import "RCTBridgeModule.h"
-#import "RCTLog.h"
 #import <AVFoundation/AVFoundation.h>
 
 @interface AudioPlayerManager : NSObject <RCTBridgeModule, AVAudioPlayerDelegate>

@@ -8,7 +8,6 @@
 
 #import "AudioRecorderManager.h"
 #import "RCTConvert.h"
-#import "RCTBridge.h"
 #import "RCTUtils.h"
 #import "RCTEventDispatcher.h"
 #import <AVFoundation/AVFoundation.h>
